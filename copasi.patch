@@ -1,0 +1,450 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index abccf8f58..ef91f999f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -84,6 +84,9 @@ endif()
+ 
+ project (COPASI VERSION "${COPASI_VERSION_MAJOR}.${COPASI_VERSION_MINOR}.${COPASI_VERSION_BUILD}")
+ 
++include(${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake)
++conan_basic_setup()
++
+ 
+ include (CMakeTestCCompiler)
+ include (CheckCSourceCompiles)
+diff --git a/CMakeModules/FindCLAPACK.cmake b/CMakeModules/FindCLAPACK.cmake
+index 915491dbd..f49f8b425 100644
+--- a/CMakeModules/FindCLAPACK.cmake
++++ b/CMakeModules/FindCLAPACK.cmake
+@@ -293,6 +293,53 @@ if (NOT CLAPACK_LINKER_FLAGS)
+ set(CLAPACK_LINKER_FLAGS ${LAPACK_LINKER_FLAGS})
+ endif(NOT CLAPACK_LINKER_FLAGS)
+ 
++if (NOT CLAPACK_LIBRARIES)
++
++if (CONAN_LIB_DIRS_LAPACK)
++
++find_library( LAPACK_LIBRARY
++                NAMES liblapack lapack lapack.dll
++                PATHS ${CONAN_LIB_DIRS_LAPACK} )
++find_library( BLAS_LIBRARY
++                NAMES libblas blas blas.dll
++                PATHS ${CONAN_LIB_DIRS_LAPACK} )
++
++SET (CLAPACK_LIBRARIES ${LAPACK_LIBRARY} ${BLAS_LIBRARY})
++SET (BLA_VENDOR "Conan")
++
++endif(CONAN_LIB_DIRS_LAPACK)
++
++if (CONAN_LIB_DIRS_CLAPACK)
++
++find_library( LAPACK_LIBRARY
++                NAMES liblapack lapack
++                PATHS ${CONAN_LIB_DIRS_CLAPACK} )
++find_library( BLAS_LIBRARY
++                NAMES libblas blas
++                PATHS ${CONAN_LIB_DIRS_CLAPACK} )
++
++find_library( F2C_LIBRARY
++                NAMES libf2c
++                PATHS ${CONAN_LIB_DIRS_CLAPACK} )
++
++SET (CLAPACK_LIBRARIES ${LAPACK_LIBRARY} ${BLAS_LIBRARY} ${F2C_LIBRARY})
++SET (CLAPACK_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_CLAPACK})
++SET (F2C_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_CLAPACK})
++SET (BLASWRAP_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_CLAPACK})
++
++SET (BLA_VENDOR "COPASI Dependencies")
++
++
++add_definitions(-DHAVE_BLASWRAP_H)
++add_definitions(-DHAVE_F2C_H)
++add_definitions(-DHAVE_CLAPACK_H)
++add_definitions(-DNO_BLAS_WRAP)
++
++
++endif(CONAN_LIB_DIRS_CLAPACK)
++
++endif(NOT CLAPACK_LIBRARIES)
++
+ # find_library(CLAPACK_LIBRARIES NAMES clapack libclapack lapack liblapapack)
+ 
+ # handle the QUIETLY and REQUIRED arguments and set CLAPACK_FOUND to TRUE if
+diff --git a/CMakeModules/FindCROSSGUID.cmake b/CMakeModules/FindCROSSGUID.cmake
+index 1d68dfc5c..1e773b876 100644
+--- a/CMakeModules/FindCROSSGUID.cmake
++++ b/CMakeModules/FindCROSSGUID.cmake
+@@ -21,6 +21,7 @@ find_package(crossguid CONFIG REQUIRED
+   PATHS $ENV{CROSSGUID_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake
+         ${COPASI_DEPENDENCY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake
+         /usr/${CMAKE_INSTALL_LIBDIR}/cmake
++        ${CONAN_LIB_DIRS_CROSSGUID}/cmake
+   )
+ 
+ if (NOT CROSSGUID_FOUND)
+@@ -58,6 +59,7 @@ if (NOT CROSSGUID_FOUND)
+           /opt/csw/lib    Blastwave
+           /opt/lib
+           /usr/freeware/lib64
++          ${CONAN_LIB_DIRS_CROSSGUID}
+     NO_DEFAULT_PATH)
+     
+   if (NOT CROSSGUID_LIBRARY)
+diff --git a/CMakeModules/FindLIBCOMBINE.cmake b/CMakeModules/FindLIBCOMBINE.cmake
+index 4d1c3cccc..cc094245a 100644
+--- a/CMakeModules/FindLIBCOMBINE.cmake
++++ b/CMakeModules/FindLIBCOMBINE.cmake
+@@ -44,6 +44,7 @@ if (NOT ${COMBINE_LIBRARY_NAME}_FOUND)
+         $ENV{COMBINE_DIR}/lib/cmake
+         ${COPASI_DEPENDENCY_DIR}/lib/cmake
+         /usr/lib/cmake
++        ${CONAN_LIB_DIRS_LIBCOMBINE}/cmake
+   )
+ endif()
+ 
+@@ -98,6 +99,7 @@ else()
+           ${COPASI_DEPENDENCY_DIR}/${CMAKE_INSTALL_LIBDIR}
+           ${COPASI_DEPENDENCY_DIR}/lib
+           ${COPASI_DEPENDENCY_DIR}
++          ${CONAN_LIB_DIRS_LIBCOMBINE}
+           ~/Library/Frameworks
+           /Library/Frameworks
+           /sw/lib         Fink
+diff --git a/CMakeModules/FindLIBSBML.cmake b/CMakeModules/FindLIBSBML.cmake
+index 072ef7328..971898785 100644
+--- a/CMakeModules/FindLIBSBML.cmake
++++ b/CMakeModules/FindLIBSBML.cmake
+@@ -38,6 +38,7 @@ if (NOT ${LIBSBML_LIBRARY_NAME}_FOUND)
+           /opt/local/lib/cmake
+           /sw/lib/cmake
+           ${COPASI_DEPENDENCY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake
++          ${CONAN_LIB_DIRS_LIBSBML}/cmake
+   )
+ endif()
+ 
+@@ -85,6 +86,7 @@ find_library(LIBSBML_LIBRARY
+           ${COPASI_DEPENDENCY_DIR}
+           ${COPASI_DEPENDENCY_DIR}/${CMAKE_INSTALL_LIBDIR}
+           ${COPASI_DEPENDENCY_DIR}/lib
++          ${CONAN_LIB_DIRS_LIBSBML}
+           ~/Library/Frameworks
+           /Library/Frameworks
+           /sw/lib        # Fink
+diff --git a/CMakeModules/FindLIBSEDML.cmake b/CMakeModules/FindLIBSEDML.cmake
+index 534cea9eb..7ad2748af 100644
+--- a/CMakeModules/FindLIBSEDML.cmake
++++ b/CMakeModules/FindLIBSEDML.cmake
+@@ -21,6 +21,40 @@
+ # Created by Robert Osfield.
+ # Modified by Ralph Gauges
+ 
++
++if(UNIX OR CYGWIN OR MINGW)
++  set(LIBSEDML_LIBRARY_NAME sedml)
++else()
++  set(LIBSEDML_LIBRARY_NAME libsedml)
++endif()
++
++
++message (STATUS "Looking for ${LIBSEDML_LIBRARY_NAME}")
++
++find_package(${LIBSEDML_LIBRARY_NAME} CONFIG QUIET)
++
++if (NOT ${LIBSEDML_LIBRARY_NAME}_FOUND)
++  find_package(${LIBSEDML_LIBRARY_NAME} CONFIG QUIET
++    PATHS /usr/lib/cmake
++          /usr/local/lib/cmake
++          /opt/lib/cmake
++          /opt/local/lib/cmake
++          /sw/lib/cmake
++          ${COPASI_DEPENDENCY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake
++          ${CONAN_LIB_DIRS_LIBSEDML}/cmake
++  )
++endif()
++
++if (${LIBSEDML_LIBRARY_NAME}_FOUND)
++
++  get_target_property(LIBSEDML_LIBRARY ${LIBSEDML_LIBRARY_NAME} LOCATION)
++  get_filename_component(LIB_PATH ${LIBSEDML_LIBRARY} DIRECTORY)
++  file(TO_CMAKE_PATH ${LIB_PATH}/../include LIBSEDML_INCLUDE_DIR)  
++  get_filename_component (LIBSEDML_INCLUDE_DIR ${LIBSEDML_INCLUDE_DIR} REALPATH)
++  get_target_property(LIBSEDML_VERSION ${LIBSEDML_LIBRARY_NAME} VERSION)
++
++else()
++
+ find_path(LIBSEDML_INCLUDE_DIR sedml/SedBase.h
+     PATHS $ENV{LIBSEDML_DIR}/include
+           $ENV{LIBSEDML_DIR}
+@@ -32,7 +66,7 @@ find_path(LIBSEDML_INCLUDE_DIR sedml/SedBase.h
+           /opt/local/include # MacPorts
+           /opt/csw/include   # Blastwave
+           /opt/include
+-          /usr/freeware/include
++          /usr/freeware/include          
+     NO_DEFAULT_PATH)
+ 
+ if (NOT LIBSEDML_INCLUDE_DIR)
+@@ -49,6 +83,7 @@ find_library(LIBSEDML_LIBRARY
+           ${COPASI_DEPENDENCY_DIR}/${CMAKE_INSTALL_LIBDIR}
+           ${COPASI_DEPENDENCY_DIR}/lib
+           ${COPASI_DEPENDENCY_DIR}
++          ${CONAN_LIB_DIRS_LIBSEDML}
+           ~/Library/Frameworks
+           /Library/Frameworks
+           /sw/lib        # Fink
+@@ -64,6 +99,11 @@ if (NOT LIBSEDML_LIBRARY)
+               sedml)
+ endif (NOT LIBSEDML_LIBRARY)
+ 
++if (NOT LIBSEDML_LIBRARY)
++    message(FATAL_ERROR "libSEDML library not found!")
++endif (NOT LIBSEDML_LIBRARY)
++
++
+ find_library(LIBNUML_LIBRARY 
+     NAMES numl-static 
+           numl
+@@ -74,6 +114,7 @@ find_library(LIBNUML_LIBRARY
+           ${COPASI_DEPENDENCY_DIR}/${CMAKE_INSTALL_LIBDIR}
+           ${COPASI_DEPENDENCY_DIR}/lib
+           ${COPASI_DEPENDENCY_DIR}
++          ${CONAN_LIB_DIRS_LIBNUML}
+           ~/Library/Frameworks
+           /Library/Frameworks
+           /sw/lib        # Fink
+@@ -83,6 +124,14 @@ find_library(LIBNUML_LIBRARY
+           /usr/freeware/lib64
+     NO_DEFAULT_PATH)
+ 
++endif()
++
++  add_library(${LIBSEDML_LIBRARY_NAME} UNKNOWN IMPORTED)
++  set_target_properties(${LIBSEDML_LIBRARY_NAME} PROPERTIES IMPORTED_LOCATION ${LIBSEDML_LIBRARY})
++  set_target_properties(${LIBSEDML_LIBRARY_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES ${LIBNUML_LIBRARY})
++  
++
++
+ if (NOT LIBSEDML_INCLUDE_DIR)
+     message(FATAL_ERROR "libsedml include dir not found not found!")
+ endif (NOT LIBSEDML_INCLUDE_DIR)
+diff --git a/copasi/CMakeConsoleApp.cmake b/copasi/CMakeConsoleApp.cmake
+index 68359ef97..18e64e404 100644
+--- a/copasi/CMakeConsoleApp.cmake
++++ b/copasi/CMakeConsoleApp.cmake
+@@ -13,5 +13,5 @@
+ # and MKL,CLAPACK LAPACK on non-apple
+ # for apple we set the Accelerate framework
+ 
+-include(${CMAKE_SOURCE_DIR}/copasi/common.cmake)
++#include(${CMAKE_SOURCE_DIR}/copasi/common.cmake)
+ 
+diff --git a/copasi/CMakeLists.txt b/copasi/CMakeLists.txt
+index b002d1320..4a8f52a8d 100644
+--- a/copasi/CMakeLists.txt
++++ b/copasi/CMakeLists.txt
+@@ -245,6 +245,8 @@ set(COPASI_HEADERS ${COPASI_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+ include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+ 
+ 
++include_directories(BEFORE ${CMAKE_BINARY_DIR})
++link_directories(${CMAKE_BINARY_DIR}/copasi)
+ 
+ 
+ include_directories(
+@@ -274,12 +276,25 @@ add_library (libCOPASISE-static STATIC $<TARGET_OBJECTS:libCOPASISE-core>)
+ endif()
+ set_target_properties (libCOPASISE-static PROPERTIES OUTPUT_NAME "COPASISE")
+ 
+-target_link_libraries(libCOPASISE-static ${LIBSEDML_LIBRARY})
+-if (${LIBNUML_LIBRARY})
+-target_link_libraries(libCOPASISE-static ${LIBNUML_LIBRARY})
+-endif()
++target_link_libraries(libCOPASISE-static ${LIBSEDML_LIBRARY_NAME})
++target_link_libraries(libCOPASISE-static ${COMBINE_LIBRARY_NAME})
++
++if (APPLE)
++  FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation REQUIRED)
++  MARK_AS_ADVANCED (COREFOUNDATION_LIBRARY)
++  target_link_libraries(libCOPASISE-static ${COREFOUNDATION_LIBRARY})
++endif (APPLE)
++
++target_link_libraries(libCOPASISE-static ${CROSSGUID_LIBRARY} ${RAPTOR_LIBRARY} ${LIBSBML_LIBRARY_NAME} ${EXPAT_LIBRARIES} ${EXPAT_LIBRARY} ${CLAPACK_LIBRARIES})
++
++ if (EXTRA_LIBS)
++   target_link_libraries(libCOPASISE-static ${EXTRA_LIBS})   
++ else ()
++   if (UNIX AND ${BLA_VENDOR} STREQUAL "Intel (MKL)")
++     target_link_libraries(libCOPASISE-static -lpthread -lm)
++   endif()
++ endif(EXTRA_LIBS)
+ 
+-target_link_libraries(libCOPASISE-static ${RAPTOR_LIBRARY} ${LIBSBML_LIBRARY} ${EXPAT_LIBRARIES} ${EXPAT_LIBRARY} ${CLAPACK_LIBRARIES})
+ 
+ #need to link against iconv
+ if (NOT (WIN32 AND NOT CYGWIN) AND NOT APPLE)
+diff --git a/copasi/CMakeUIApp.cmake b/copasi/CMakeUIApp.cmake
+index b21579a9f..75eef9fad 100644
+--- a/copasi/CMakeUIApp.cmake
++++ b/copasi/CMakeUIApp.cmake
+@@ -9,5 +9,5 @@
+ # All rights reserved. 
+ 
+ # nothing special to be done for an application or library
+-include (${CMAKE_SOURCE_DIR}/copasi/CMakeUILib.cmake)
++#include (${CMAKE_SOURCE_DIR}/copasi/CMakeUILib.cmake)
+ 
+diff --git a/copasi/CMakeUILib.cmake b/copasi/CMakeUILib.cmake
+index 2d4bdf28a..942d8a463 100644
+--- a/copasi/CMakeUILib.cmake
++++ b/copasi/CMakeUILib.cmake
+@@ -9,33 +9,33 @@
+ # All rights reserved. 
+ 
+ 
+-include (${CMAKE_SOURCE_DIR}/copasi/common.cmake)
+-
+-if (NOT Qt5_FOUND)
+-include(${QT_USE_FILE})
+-endif()
+-
+-#setup SBW
+-if (ENABLE_SBW_INTEGRATION)
+-set(UI_EXTERNAL_LIBS ${UI_EXTERNAL_LIBS} ${SBW_LIBRARIES})
+-include_directories(BEFORE ${SBW_INCLUDE_DIR})
+-endif()
+-
+-#setup qwt
+-set(UI_EXTERNAL_LIBS ${UI_EXTERNAL_LIBS} ${QWT_LIBRARY})
+-include_directories(BEFORE ${QWT_INCLUDE_DIR})
+-
+-#setup qwtplot3d
+-set(UI_EXTERNAL_LIBS ${UI_EXTERNAL_LIBS} ${QWTPLOT3D_LIBRARY})
+-include_directories(BEFORE ${QWTPLOT3D_INCLUDE_DIR})
+-
+-#setup mml
+-if(ENABLE_MML)
+-set(UI_EXTERNAL_LIBS ${UI_EXTERNAL_LIBS} ${MML_LIBRARY})
+-include_directories(BEFORE ${MML_INCLUDE_DIR})
+-endif(ENABLE_MML)
+-
+-include_directories(${CMAKE_BINARY_DIR})
+-include_directories(${CMAKE_BINARY_DIR}/copasi)
+-include_directories(${CMAKE_BINARY_DIR}/copasi/UI)
++# include (${CMAKE_SOURCE_DIR}/copasi/common.cmake)
++
++# if (NOT Qt5_FOUND)
++# include(${QT_USE_FILE})
++# endif()
++
++# #setup SBW
++# if (ENABLE_SBW_INTEGRATION)
++# set(UI_EXTERNAL_LIBS ${UI_EXTERNAL_LIBS} ${SBW_LIBRARIES})
++# include_directories(BEFORE ${SBW_INCLUDE_DIR})
++# endif()
++
++# #setup qwt
++# set(UI_EXTERNAL_LIBS ${UI_EXTERNAL_LIBS} ${QWT_LIBRARY})
++# include_directories(BEFORE ${QWT_INCLUDE_DIR})
++
++# #setup qwtplot3d
++# set(UI_EXTERNAL_LIBS ${UI_EXTERNAL_LIBS} ${QWTPLOT3D_LIBRARY})
++# include_directories(BEFORE ${QWTPLOT3D_INCLUDE_DIR})
++
++# #setup mml
++# if(ENABLE_MML)
++# set(UI_EXTERNAL_LIBS ${UI_EXTERNAL_LIBS} ${MML_LIBRARY})
++# include_directories(BEFORE ${MML_INCLUDE_DIR})
++# endif(ENABLE_MML)
++
++# include_directories(${CMAKE_BINARY_DIR})
++# include_directories(${CMAKE_BINARY_DIR}/copasi)
++# include_directories(${CMAKE_BINARY_DIR}/copasi/UI)
+ 
+diff --git a/copasi/CopasiSE/CMakeLists.txt b/copasi/CopasiSE/CMakeLists.txt
+index add2e9351..ea824615a 100644
+--- a/copasi/CopasiSE/CMakeLists.txt
++++ b/copasi/CopasiSE/CMakeLists.txt
+@@ -43,7 +43,7 @@ if (BUILD_STATIC_COPASISE)
+ endif (BUILD_STATIC_COPASISE) 
+ 
+ add_executable(CopasiSE ${COPSISE_SOURCES})
+-target_link_libraries(CopasiSE ${SE_LIBS} ${SE_EXTERNAL_LIBS})
++target_link_libraries(CopasiSE libCOPASISE-static)
+ 
+ install(TARGETS CopasiSE DESTINATION bin)
+ 
+diff --git a/copasi/common.cmake b/copasi/common.cmake
+index 08ad16ad1..326b437b7 100644
+--- a/copasi/common.cmake
++++ b/copasi/common.cmake
+@@ -10,45 +10,26 @@
+ 
+ 
+ 
+-if(NOT COPASI_COMMON_INCLUDED)
+-set (COPASI_COMMON_INCLUDED ON)
++# if(NOT COPASI_COMMON_INCLUDED)
++# set (COPASI_COMMON_INCLUDED ON)
+ 
+-set(UI_LIBS libCOPASIUI )
++# set(UI_LIBS libCOPASIUI )
+ 
+-include_directories(BEFORE ${CMAKE_BINARY_DIR})
+-link_directories(${CMAKE_BINARY_DIR}/copasi)
++# include_directories(BEFORE ${CMAKE_BINARY_DIR})
++# link_directories(${CMAKE_BINARY_DIR}/copasi)
+ 
+ set(SE_LIBS  libCOPASISE-static)
+ set(SE_DEPENDENCIES  libCOPASISE-static)
+ 
+-set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${CLAPACK_LIBRARIES})
+-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CLAPACK_LINKER_FLAGS}")
++# set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${CLAPACK_LIBRARIES})
++# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CLAPACK_LINKER_FLAGS}")
+ 
+-set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${LIBSBML_LIBRARY})
+-set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${RAPTOR_LIBRARY})
+-set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${EXPAT_LIBRARY})
+-set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${CROSSGUID_LIBRARY})
++# set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${LIBSBML_LIBRARY})
++# set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${RAPTOR_LIBRARY})
++# set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${EXPAT_LIBRARY})
++# set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${CROSSGUID_LIBRARY})
+ 
+ 
+-set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${LIBSEDML_LIBRARY})
+-if (LIBNUML_LIBRARY)
+-  set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${LIBNUML_LIBRARY})
+-endif()
+ 
+-set(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${COMBINE_LIBRARY})
+ 
+-if (APPLE)
+-  FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation REQUIRED)
+-  MARK_AS_ADVANCED (COREFOUNDATION_LIBRARY)
+-  SET(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${COREFOUNDATION_LIBRARY})
+-endif (APPLE)
+-
+-if (EXTRA_LIBS)
+-  SET(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} ${EXTRA_LIBS})
+-else ()
+-  if (UNIX AND ${BLA_VENDOR} STREQUAL "Intel (MKL)")
+-    SET(SE_EXTERNAL_LIBS ${SE_EXTERNAL_LIBS} -lpthread -lm)
+-  endif()
+-endif(EXTRA_LIBS)
+-
+-endif()
++# endif()
+diff --git a/copasi/utilities/CVersion.h b/copasi/utilities/CVersion.h
+index 3848593a4..c760d67ee 100644
+--- a/copasi/utilities/CVersion.h
++++ b/copasi/utilities/CVersion.h
+@@ -33,7 +33,7 @@
+ 
+ #include <set>
+ 
+-#include "copasi.h"
++#include <copasi/copasi.h>
+ 
+ class CVersion
+ {
