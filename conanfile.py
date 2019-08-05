@@ -138,4 +138,6 @@ conan_basic_setup()''')
         self.cpp_info.libs = [libfile]
         if self.settings.os == "Macos":
             self.cpp_info.exelinkflags.append("-framework CoreFoundation")
-            self.cpp_info.exelinkflags.append("-framework vecLib")
+            self.cpp_info.exelinkflags.append("-framework Accelerate")
+        if not self.settings.os == "Windows":
+          self.cpp_info.cxxflags = ["-std=c++11"]
