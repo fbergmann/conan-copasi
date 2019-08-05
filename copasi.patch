@@ -1,11 +1,14 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index abccf8f58..ef91f999f 100644
+index abccf8f58..6acb6659f 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -84,6 +84,9 @@ endif()
+@@ -84,6 +84,12 @@ endif()
  
  project (COPASI VERSION "${COPASI_VERSION_MAJOR}.${COPASI_VERSION_MINOR}.${COPASI_VERSION_BUILD}")
  
++include(${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake)
++conan_basic_setup()
++
 +include(${CMAKE_BINARY_DIR}/../conanbuildinfo.cmake)
 +conan_basic_setup()
 +
@@ -13,14 +16,14 @@ index abccf8f58..ef91f999f 100644
  include (CMakeTestCCompiler)
  include (CheckCSourceCompiles)
 diff --git a/CMakeModules/FindCLAPACK.cmake b/CMakeModules/FindCLAPACK.cmake
-index 915491dbd..f49f8b425 100644
+index 915491dbd..9e2a60987 100644
 --- a/CMakeModules/FindCLAPACK.cmake
 +++ b/CMakeModules/FindCLAPACK.cmake
 @@ -293,6 +293,53 @@ if (NOT CLAPACK_LINKER_FLAGS)
  set(CLAPACK_LINKER_FLAGS ${LAPACK_LINKER_FLAGS})
  endif(NOT CLAPACK_LINKER_FLAGS)
  
-+if (NOT CLAPACK_LIBRARIES)
++if (NOT CLAPACK_LIBRARIES AND NOT APPLE)
 +
 +if (CONAN_LIB_DIRS_LAPACK)
 +

@@ -61,7 +61,8 @@ class CopasiConan(ConanFile):
         #    self.options['lapack'].visual_studio=True
         #    self.options['lapack'].shared = True
         
-        self.requires("clapack/3.2.1@fbergmann/stable")
+        if not self.settings.os == "Macos":
+          self.requires("clapack/3.2.1@fbergmann/stable")
 
 
     def source(self):
@@ -135,3 +136,6 @@ conan_basic_setup()''')
                 libfile += ".lib"
 
         self.cpp_info.libs = [libfile]
+        if self.settings.os == "Macos":
+            self.cpp_info.exelinkflags.append("-framework CoreFoundation")
+            self.cpp_info.exelinkflags.append("-framework vecLib")
