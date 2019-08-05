@@ -8451,6 +8451,19 @@ index ed50d6f7b..bb3b17f6b 100644
  
  CFunctionDB::CFunctionDB(const std::string & name,
                           const CDataContainer * pParent):
+diff --git a/copasi/function/CFunctionParameter.cpp b/copasi/function/CFunctionParameter.cpp
+index cd3033608..4f282de8c 100644
+--- a/copasi/function/CFunctionParameter.cpp
++++ b/copasi/function/CFunctionParameter.cpp
+@@ -131,7 +131,7 @@ CFunctionParameter::CFunctionParameter(const CFunctionParameter & src,
+ {}
+ 
+ CFunctionParameter::CFunctionParameter(const std::string &name,
+-                                       const enum CFunctionParameter::DataType &type,
++                                       const CFunctionParameter::DataType &type,
+                                        Role usage,
+                                        const CDataContainer * pParent) :
+   CDataContainer(name, pParent, "Variable"),
 diff --git a/copasi/function/CFunctionParameter.h b/copasi/function/CFunctionParameter.h
 index 1c87e3b52..0737829f0 100644
 --- a/copasi/function/CFunctionParameter.h
