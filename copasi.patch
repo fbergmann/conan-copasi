@@ -8741,6 +8741,19 @@ index 750c4687d..147f755d7 100644
  #include "CLayoutEngine.h"
  #include "CAbstractLayoutInterface.h"
  
+diff --git a/copasi/layout/CLayoutEngine.h b/copasi/layout/CLayoutEngine.h
+index 5952a52e5..66499c3d0 100644
+--- a/copasi/layout/CLayoutEngine.h
++++ b/copasi/layout/CLayoutEngine.h
+@@ -9,7 +9,7 @@
+ #include <vector>
+ #include <sstream>
+ 
+-#include "odepack++/CLSODA.h"
++#include "copasi/odepack++/CLSODA.h"
+ 
+ class CAbstractLayoutInterface;
+ 
 diff --git a/copasi/layout/CLayoutInitializer.cpp b/copasi/layout/CLayoutInitializer.cpp
 index 28c4ae712..71a9d409a 100644
 --- a/copasi/layout/CLayoutInitializer.cpp
@@ -10391,6 +10404,21 @@ index 09638ecde..f1ebb4999 100644
  
  #include "CInternalSolver.h"
  
+diff --git a/copasi/odepack++/CInternalSolver.h b/copasi/odepack++/CInternalSolver.h
+index ba0652519..d661b4f8e 100644
+--- a/copasi/odepack++/CInternalSolver.h
++++ b/copasi/odepack++/CInternalSolver.h
+@@ -24,8 +24,8 @@
+ #ifndef ODEPACK_CInternalSolver
+ #define ODEPACK_CInternalSolver
+ 
+-#include "odepack++/common.h"
+-#include "odepack++/Cxerrwd.h"
++#include "copasi/odepack++/common.h"
++#include "copasi/odepack++/Cxerrwd.h"
+ 
+ class CInternalSolver
+ {
 diff --git a/copasi/odepack++/CLSODA.cpp b/copasi/odepack++/CLSODA.cpp
 index 18f4073f9..26084ab65 100644
 --- a/copasi/odepack++/CLSODA.cpp
@@ -10404,6 +10432,28 @@ index 18f4073f9..26084ab65 100644
  
  #include "CLSODA.h"
  #include "Cxerrwd.h"
+diff --git a/copasi/odepack++/CLSODA.h b/copasi/odepack++/CLSODA.h
+index e8b3d49af..de94c6a28 100644
+--- a/copasi/odepack++/CLSODA.h
++++ b/copasi/odepack++/CLSODA.h
+@@ -6,7 +6,7 @@
+    $Date: 2006/10/15 07:38:41 $
+    End CVS Header */
+ 
+-// Copyright © 2006 by Pedro Mendes, Virginia Tech Intellectual
++// Copyright ï¿½ 2006 by Pedro Mendes, Virginia Tech Intellectual
+ // Properties, Inc. and EML Research, gGmbH.
+ // All rights reserved.
+ //
+@@ -16,7 +16,7 @@
+ #ifndef ODEPACK_CLSODA
+ #define ODEPACK_CLSODA
+ 
+-#include "odepack++/CInternalSolver.h"
++#include "copasi/odepack++/CInternalSolver.h"
+ 
+ class PJAC;
+ class SLVS;
 diff --git a/copasi/odepack++/CLSODAR.cpp b/copasi/odepack++/CLSODAR.cpp
 index cfa0c2901..e3780b050 100644
 --- a/copasi/odepack++/CLSODAR.cpp
@@ -10417,6 +10467,28 @@ index cfa0c2901..e3780b050 100644
  #include "lapack/blaswrap.h"
  #include "lapack/lapackwrap.h"
  
+diff --git a/copasi/odepack++/CLSODAR.h b/copasi/odepack++/CLSODAR.h
+index 8558c8f3a..017fa4c47 100644
+--- a/copasi/odepack++/CLSODAR.h
++++ b/copasi/odepack++/CLSODAR.h
+@@ -6,7 +6,7 @@
+    $Date: 2006/10/15 07:38:41 $
+    End CVS Header */
+ 
+-// Copyright © 2006 by Pedro Mendes, Virginia Tech Intellectual
++// Copyright ï¿½ 2006 by Pedro Mendes, Virginia Tech Intellectual
+ // Properties, Inc. and EML Research, gGmbH.
+ // All rights reserved.
+ //
+@@ -16,7 +16,7 @@
+ #ifndef ODEPACK_CLSODAR
+ #define ODEPACK_CLSODAR
+ 
+-#include "odepack++/CInternalSolver.h"
++#include "copasi/odepack++/CInternalSolver.h"
+ 
+ class PJAC;
+ class SLVS;
 diff --git a/copasi/odepack++/CRadau5.cpp b/copasi/odepack++/CRadau5.cpp
 index 1a3204d1c..ac156e760 100755
 --- a/copasi/odepack++/CRadau5.cpp
@@ -10430,6 +10502,19 @@ index 1a3204d1c..ac156e760 100755
  
  #include "CRadau5.h"
  #include "Cxerrwd.h"
+diff --git a/copasi/odepack++/CRadau5.h b/copasi/odepack++/CRadau5.h
+index dc42aaca1..05148ab9c 100755
+--- a/copasi/odepack++/CRadau5.h
++++ b/copasi/odepack++/CRadau5.h
+@@ -8,7 +8,7 @@
+ #ifndef ODEPACK_CRadau5
+ #define ODEPACK_CRadau5
+ 
+-#include "odepack++/CInternalSolver.h"
++#include "copasi/odepack++/CInternalSolver.h"
+ #include "dc_decsol.h"
+ 
+ 
 diff --git a/copasi/odepack++/Cxerrwd.cpp b/copasi/odepack++/Cxerrwd.cpp
 index ad0019e06..dcfc92632 100644
 --- a/copasi/odepack++/Cxerrwd.cpp
@@ -15182,18 +15267,21 @@ index 37222ecee..455bfc795 100644
  #include "lapack/lapackwrap.h"        // CLAPACK
  #include "lapack/blaswrap.h"           // BLAS
 diff --git a/copasi/tssanalysis/CCSPMethod.h b/copasi/tssanalysis/CCSPMethod.h
-index 7accf4175..ea3a5b919 100644
+index 7accf4175..cab2b9f07 100644
 --- a/copasi/tssanalysis/CCSPMethod.h
 +++ b/copasi/tssanalysis/CCSPMethod.h
-@@ -24,7 +24,7 @@
+@@ -24,9 +24,9 @@
  
  #include "copasi/core/CMatrix.h"
  #include "copasi/core/CVector.h"
 -#include "tssanalysis/CTSSAMethod.h"
 +#include "copasi/tssanalysis/CTSSAMethod.h"
  
- #include "odepack++/CLSODA.h"
+-#include "odepack++/CLSODA.h"
++#include "copasi/odepack++/CLSODA.h"
  
+ class CModel;
+ class CState;
 diff --git a/copasi/tssanalysis/CILDMMethod.cpp b/copasi/tssanalysis/CILDMMethod.cpp
 index 8175d1330..b8db179b8 100644
 --- a/copasi/tssanalysis/CILDMMethod.cpp
