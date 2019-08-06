@@ -45,14 +45,14 @@ index 915491dbd..9e2a60987 100644
 +if (CONAN_LIB_DIRS_CLAPACK)
 +
 +find_library( LAPACK_LIBRARY
-+                NAMES liblapack lapack
++                NAMES liblapack lapack liblapack.a
 +                PATHS ${CONAN_LIB_DIRS_CLAPACK} )
 +find_library( BLAS_LIBRARY
-+                NAMES libblas blas
++                NAMES libblas blas libblas.a
 +                PATHS ${CONAN_LIB_DIRS_CLAPACK} )
 +
 +find_library( F2C_LIBRARY
-+                NAMES libf2c
++                NAMES libf2c libf2c.a
 +                PATHS ${CONAN_LIB_DIRS_CLAPACK} )
 +
 +SET (CLAPACK_LIBRARIES ${LAPACK_LIBRARY} ${BLAS_LIBRARY} ${F2C_LIBRARY})
