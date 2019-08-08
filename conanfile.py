@@ -20,12 +20,14 @@ class CopasiConan(ConanFile):
         "shared": [True, False],
         "fPIC": [True, False],
         "copasi_se": [True, False]
+        #"copasi_ui": [True, False]
     }
 
     default_options = (
         "shared=False",
         "fPIC=True",
         "copasi_se=True"
+        #"copasi_ui=True"
     )
 
     generators = "cmake"
@@ -63,6 +65,15 @@ class CopasiConan(ConanFile):
         
         if not self.settings.os == "Macos":
           self.requires("clapack/3.2.1@fbergmann/stable")
+          
+        #if self.options.copasi_ui:
+        #  self.requires("bzip2/1.0.8@conan/stable")
+        #  self.requires("qt/5.13.0@bincrafters/stable")
+        #  self.options['qt'].qtcharts = True
+        #  self.options['qt'].qtdatavis3d = True
+        #  self.options['qt'].qtgraphicaleffects = True
+        #  self.options['qt'].with_mysql = False
+        #  self.options['qt'].with_odbc = False
 
 
     def source(self):
