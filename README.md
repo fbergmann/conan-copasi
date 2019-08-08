@@ -1,10 +1,11 @@
+ [ ![Download](https://api.bintray.com/packages/fbergmann/conan/copasi%3Afbergmann/images/download.svg) ](https://bintray.com/fbergmann/conan/copasi%3Afbergmann/_latestVersion)
 
 ## Conan package recipe for [*COPASI*](https://copasi.org)
 
 
 
 ## Issues
-All conan specific issues should be tracked in this projects 
+All conan specific issues should be tracked in [this project](https://github.com/fbergmann/conan-copasi/issues).
 
 To report possible COPASI bugs or other issues:
 
@@ -52,12 +53,9 @@ The following command both runs all the steps of the conan file, and publishes t
 
 You might need to add the Conan Center repo before installing the package:
 
-    $ conan remote add conan-center "https://conan.bintray.com"
+    $ conan remote add fbergmann "https://api.bintray.com/conan/fbergmann/conan"
 
 
 ## Conan Recipe License
 
-NOTE: The conan recipe license applies only to the files of this recipe, which can be used to build and package zlib.
-It does *not* in any way apply or is related to the actual software being packaged.
-
-[MIT](LICENSE)
+Just as COPASI, the conan recipe uses the [Artistic License 2.0](https://opensource.org/licenses/Artistic-2.0).

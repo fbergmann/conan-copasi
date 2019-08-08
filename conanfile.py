@@ -67,8 +67,7 @@ class CopasiConan(ConanFile):
 
     def source(self):
         git = tools.Git("src")
-        git.clone("https://github.com/copasi/COPASI/")
-        tools.patch(patch_file="copasi.patch", base_path="src")
+        git.clone("https://github.com/copasi/COPASI/", branch="release/Version-4.27")
         copyfile('CopasiVersion.h', 'src/copasi/CopasiVersion.h')
         tools.replace_in_file('src/CMakeLists.txt', 'project (COPASI VERSION "${COPASI_VERSION_MAJOR}.${COPASI_VERSION_MINOR}.${COPASI_VERSION_BUILD}")', '''project (COPASI VERSION "${COPASI_VERSION_MAJOR}.${COPASI_VERSION_MINOR}.${COPASI_VERSION_BUILD}")
 
@@ -77,6 +76,7 @@ conan_basic_setup()''')
 
     def _configure(self, cmake):
         args = ['-DCOPASI_INSTALL_C_API=ON', 
+        '-DDISABLE_CORE_OBJECT_LIBRARY=ON',
         '-DBUILD_GUI=OFF']
         if self.options.copasi_se: 
             args.append('-DBUILD_SE=ON')
@@ -93,11 +93,6 @@ conan_basic_setup()''')
         cmake = CMake(self)
         self._configure(cmake)
         cmake.build()
-
-    #def imports(self):
-    #    self.copy("*.dll", src="bin", dst="bin")
-    #    self.copy("*.dylib*", src="lib", dst="bin")
-    #    self.copy("*.so*", src="lib", dst="bin")
 
     def package(self):
         cmake = CMake(self)
