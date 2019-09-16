@@ -6,7 +6,7 @@ from shutil import copyfile
 class CopasiConan(ConanFile):
 
     name = "copasi"
-    version = "4.26.213"
+    version = "4.27.217"
     url = "http://github.com/fbergmann/conan-copasi"
     homepage = "https://copasi.org"
     author = "Frank Bergmann"
@@ -78,7 +78,7 @@ class CopasiConan(ConanFile):
 
     def source(self):
         git = tools.Git("src")
-        git.clone("https://github.com/copasi/COPASI/", branch="release/Version-4.27")
+        git.clone("https://github.com/copasi/COPASI/", branch="hotfix/Version-4.27")
         copyfile('CopasiVersion.h', 'src/copasi/CopasiVersion.h')
         tools.replace_in_file('src/CMakeLists.txt', 'project (COPASI VERSION "${COPASI_VERSION_MAJOR}.${COPASI_VERSION_MINOR}.${COPASI_VERSION_BUILD}")', '''project (COPASI VERSION "${COPASI_VERSION_MAJOR}.${COPASI_VERSION_MINOR}.${COPASI_VERSION_BUILD}")
 
@@ -109,6 +109,7 @@ conan_basic_setup()''')
         cmake = CMake(self)
         self._configure(cmake)
         cmake.install()
+        cmake.patch_config_paths()
         self.copy("*.lib", dst="lib", keep_path=False)
         if self.settings.os == "Windows":
             self.copy("*.dll", dst="bin", keep_path=False)
